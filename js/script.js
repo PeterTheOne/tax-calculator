@@ -1,8 +1,10 @@
 $(function() {
 
-  //var population = 8579747;
-  //var percPopulation = population / 100;
+  // source: http://www.statistik.at/web_de/statistiken/bevoelkerung/haushalte_familien_lebensformen/index.html
+  var households = 3705000;
+  var percHouseholds = households / 100.0;
 
+  // source: http://media.arbeiterkammer.at/PDF/Vermoegen_in_Oesterreich.pdf
   var data = [
     {
       percentile: 7,
@@ -26,9 +28,13 @@ $(function() {
       $(this).val('1.00');
     } else if (parseFloat($('input.taxRate').val()) < 0.0) {
       $(this).val('0.00');
+    } else if ($('input.taxRate').val() === '') {
+      $('input.taxRate').val(0);
     }
 
     if (parseInt($('input.threshold').val()) < 0) {
+      $('input.threshold').val(0);
+    } else if ($('input.threshold').val() === '') {
       $('input.threshold').val(0);
     }
   }
@@ -36,9 +42,10 @@ $(function() {
   function calculateTaxRevenue(taxRate, threshold) {
     var taxRevenue = 0;
     $(data).each(function(index, value) {
-      //if (value.averageWealth > threshold) {
-        taxRevenue += value.totalWealth * taxRate;
-      //}
+      var taxableWealth = value.averageWealth - threshold;
+      taxableWealth = taxableWealth < 0 ? 0 : taxableWealth;
+
+      taxRevenue += taxableWealth * taxRate * percHouseholds;
     });
     return taxRevenue;
   }
@@ -62,6 +69,6 @@ $(function() {
     main();
   });
 
-
+  main();
 
 });
